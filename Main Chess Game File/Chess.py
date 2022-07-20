@@ -20,9 +20,7 @@ def init():
     #Declaration of global variables
 
     global WHITE
-    global BROWN
     WHITE = (255, 255, 255)
-    BROWN = (160, 82, 45)
 
     #ChessPieces
 Pawn_White = pygame.image.load(os.path.join("assets", "PawnW.png"))
@@ -39,6 +37,8 @@ Bishop_Black = pygame.image.load(os.path.join("assets", "BishopB.png"))
 King_Black = pygame.image.load(os.path.join("assets", "KingB.png"))
 Queen_Black = pygame.image.load(os.path.join("assets", "QueenB.png"))
 
+BROWN = pygame.image.load(os.path.join("assets", "Z-Brown.png"))
+TAN = pygame.image.load(os.path.join("assets", "Z-Tan.png"))
 
 if __name__ == "__main__":
     init()
@@ -46,8 +46,6 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode(size)
     selectPos = (-1, -1)
     dropPos = (-1, -1)
-screen.fill(BROWN)
-
 
 while True:
     #Check for mouse click event
@@ -83,11 +81,24 @@ while True:
             dropPos = (-1, -1)
 
     #Draw Grid
-    #Horizontal lines
 
     for i in range(1,8,1): #Start at 1, reach up to 8, increase by 1
         pygame.draw.line(screen, WHITE, (0, i * 100 * ASPECT_RATIO), (screen.get_width(), i * 100 * ASPECT_RATIO))
         pygame.draw.line(screen, WHITE, (i * 100 * ASPECT_RATIO, 0), (i * 100 * ASPECT_RATIO, screen.get_height()))
+
+    #Alternating board colours
+
+    temp_img = pygame.transform.scale(TAN, (70, 70))
+    squareposition = [(0, 0), (70, 70), (140, 140), (210, 210), (280, 280), (350,350),(420,420),(490,490),(140,0),(280,0),(420,0),(0,140),(0,280),(0,420),(70,210),(70,350),(70,490),(350,70),(210,70),(490,70),(280,140),(420,140),(140,280),(140,420),(350,210),(420,280),(490,350),(490,210),(210,350),(210,490),(280,420),(350,490)]
+    position = ()
+    for position in squareposition:
+        screen.blit(temp_img, position)
+
+    temp_img = pygame.transform.scale(BROWN, (70, 70))
+    squareposition = [(70, 0), (140, 70), (210, 140), (280, 210), (350, 280), (420, 350), (490, 420), (560, 490),(210,0),(350,0),(490,0),(0,70),(0,210),(0,350),(0,490),(70,140),(280,70),(420,70),(350,140),(490,140),(140,210),(70,280),(70,420),(140,350),(140,490),(210,280),(280,350),(350,420),(420,490),(420,210),(490,280),(210,420),(280,490)]
+    position = ()
+    for position in squareposition:
+        screen.blit(temp_img, position)
 
     #Draw Pieces
 
