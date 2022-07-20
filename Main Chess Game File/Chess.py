@@ -20,7 +20,13 @@ def init():
     #Declaration of global variables
 
     global WHITE
+    global BROWN
+    global TAN
     WHITE = (255, 255, 255)
+    BROWN = (139,69,1)
+    TAN = (210,180,140)
+
+    pygame.display.set_caption("ChessPlus")
 
     #ChessPieces
 Pawn_White = pygame.image.load(os.path.join("assets", "PawnW.png"))
@@ -36,9 +42,6 @@ Knight_Black = pygame.image.load(os.path.join("assets", "KnightB.png"))
 Bishop_Black = pygame.image.load(os.path.join("assets", "BishopB.png"))
 King_Black = pygame.image.load(os.path.join("assets", "KingB.png"))
 Queen_Black = pygame.image.load(os.path.join("assets", "QueenB.png"))
-
-BROWN = pygame.image.load(os.path.join("assets", "Z-Brown.png"))
-TAN = pygame.image.load(os.path.join("assets", "Z-Tan.png"))
 
 if __name__ == "__main__":
     init()
@@ -88,17 +91,22 @@ while True:
 
     #Alternating board colours
 
-    temp_img = pygame.transform.scale(TAN, (70, 70))
-    squareposition = [(0, 0), (70, 70), (140, 140), (210, 210), (280, 280), (350,350),(420,420),(490,490),(140,0),(280,0),(420,0),(0,140),(0,280),(0,420),(70,210),(70,350),(70,490),(350,70),(210,70),(490,70),(280,140),(420,140),(140,280),(140,420),(350,210),(420,280),(490,350),(490,210),(210,350),(210,490),(280,420),(350,490)]
-    position = ()
-    for position in squareposition:
-        screen.blit(temp_img, position)
-
-    temp_img = pygame.transform.scale(BROWN, (70, 70))
-    squareposition = [(70, 0), (140, 70), (210, 140), (280, 210), (350, 280), (420, 350), (490, 420), (560, 490),(210,0),(350,0),(490,0),(0,70),(0,210),(0,350),(0,490),(70,140),(280,70),(420,70),(350,140),(490,140),(140,210),(70,280),(70,420),(140,350),(140,490),(210,280),(280,350),(350,420),(420,490),(420,210),(490,280),(210,420),(280,490)]
-    position = ()
-    for position in squareposition:
-        screen.blit(temp_img, position)
+    for i in range(0,8,1): #Start at 1, reach up to 8, increase by 1
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 70,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO + 140,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 210,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO + 280,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 350,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO + 420,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 490,i * 100 * ASPECT_RATIO,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 70,70,70))
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 140,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 210,70,70))
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 280,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 350,70,70))
+        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 420,70,70))
+        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 490,70,70))
 
     #Draw Pieces
 
