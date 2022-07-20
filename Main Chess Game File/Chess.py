@@ -1,10 +1,9 @@
 import pygame
 import os
+from chess_piece import *
 
 ASPECT_RATIO = 0.7
 INDEX_TO_GRID = ["A", "B", "C", "D", "E", "F", "G", "H"]
-CHESS_IMGS = ()
-
 
 def init():
     """
@@ -22,13 +21,17 @@ def init():
     global WHITE
     global BROWN
     global TAN
+    global test_piece
     WHITE = (255, 255, 255)
     BROWN = (139,69,1)
     TAN = (210,180,140)
 
+    test_piece = ChessPiece(1, 1, 0, True)
+
+    pygame.display.set_icon(pygame.image.load(os.path.join("assets", "KnightW.png")).copy())
     pygame.display.set_caption("ChessPlus")
 
-    #ChessPieces
+#ChessPieces
 Pawn_White = pygame.image.load(os.path.join("assets", "PawnW.png"))
 Rook_White = pygame.image.load(os.path.join("assets", "RookW.png"))
 Knight_White = pygame.image.load(os.path.join("assets", "KnightW.png"))
@@ -80,37 +83,20 @@ while True:
             dropPos = (colNum, rowNum)
             print("Moved Piece from " + str(INDEX_TO_GRID[selectPos[0]]) + str(selectPos[1] + 1) \
                   + " to " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
+            test_piece.move(colNum + 1, rowNum + 1)
             selectPos = (-1, -1)
             dropPos = (-1, -1)
 
-    #Draw Grid
+    #Draw board colours
 
-    for i in range(1,8,1): #Start at 1, reach up to 8, increase by 1
-        pygame.draw.line(screen, WHITE, (0, i * 100 * ASPECT_RATIO), (screen.get_width(), i * 100 * ASPECT_RATIO))
-        pygame.draw.line(screen, WHITE, (i * 100 * ASPECT_RATIO, 0), (i * 100 * ASPECT_RATIO, screen.get_height()))
+    for i in range(8): #Start at 1, reach up to 8, increase by 1
+        for j in range(0,8,1):
+            if (i % 2 == 0 and j % 2 == 0) or (i % 2 == 1 and j % 2 == 1):
+                pygame.draw.rect(screen, TAN, pygame.Rect(j * 100 * ASPECT_RATIO, i * 100 * ASPECT_RATIO, 100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
+            else:
+                pygame.draw.rect(screen, BROWN, pygame.Rect(j * 100 * ASPECT_RATIO, i * 100 * ASPECT_RATIO, 100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
 
-    #Alternating board colours
-
-    for i in range(0,8,1): #Start at 1, reach up to 8, increase by 1
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 70,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO + 140,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 210,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO + 280,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 350,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO + 420,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO + 490,i * 100 * ASPECT_RATIO,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 70,70,70))
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 140,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 210,70,70))
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 280,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 350,70,70))
-        pygame.draw.rect(screen, TAN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 420,70,70))
-        pygame.draw.rect(screen, BROWN, pygame.Rect(i * 100 * ASPECT_RATIO,i * 100 * ASPECT_RATIO + 490,70,70))
-
-    #Draw Pieces
-
-    #White Pieces
+    ##White Pieces
     temp_img = pygame.transform.scale(Pawn_White, (53,53))
     PawnPositions = [(9,430), (79,430), (149,430), (219,430), (289,430), (359,430), (429,430), (499,430)]
     position = ()
@@ -141,7 +127,10 @@ while True:
     temp_img = pygame.transform.scale(King_White, (60, 60))
     screen.blit(temp_img, (286, 497))
 
-    #Black Pieces
+    ##Black Pieces
+
+    mx = pygame.mouse.get_pos()
+    print(mx)
 
     temp_img = pygame.transform.scale(Pawn_Black, (53, 53))
     PawnPositions = [(8, 80), (78, 80), (148, 80), (218, 80), (288, 80), (358, 80), (428, 80), (500, 80)]
@@ -173,7 +162,23 @@ while True:
     temp_img = pygame.transform.scale(King_Black, (60, 60))
     screen.blit(temp_img, (286, 6))
 
-    #Vertical lines
+    test_piece.render(screen)
+
+    def init(self, row, col, rank, white_piece):
+
+        if rank == 0:
+            self.img(pygame.image.load(os.path.join("assets", "PawnW.png")))
+        elif rank == 1:
+            self.img(pygame.image.load(os.path.join("assets", "KnightW.png")))
+        elif rank == 2:
+            self.img(pygame.image.load(os.path.join("assets", "BishopW.png")))
+        elif rank == 3:
+            self.img(pygame.image.load(os.path.join("assets", "RookW.png")))
+        elif rank == 4:
+            self.img(pygame.image.load(os.path.join("assets", "QueenW.png")))
+        elif rank == 5:
+            self.img(pygame.image.load(os.path.join("assets", "KingW.png")))
+
     pygame.display.flip()
 
     pass
