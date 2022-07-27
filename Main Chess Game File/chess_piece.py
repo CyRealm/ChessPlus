@@ -6,9 +6,9 @@ class ChessPiece:
     """
     Stores info regarding a chess piece
     PAWN = 0
-    ROOK = 1
-    HORSE = 2
-    BISHOP = 3
+    ROOK = 1 and 8
+    HORSE = 2 and 7
+    BISHOP = 3 and 6
     QUEEN = 4
     KING = 5
     """
@@ -33,11 +33,11 @@ class ChessPiece:
 
         if rank == 0:
             self.img = pygame.image.load("assets/Pawn" + addon + ".png")
-        elif rank == 1:
+        elif rank == 1 or rank == 8:
             self.img = pygame.image.load("assets/Rook" + addon + ".png")
-        elif rank == 2:
+        elif rank == 2 or rank == 7:
             self.img = pygame.image.load("assets/Knight" + addon + ".png")
-        elif rank == 3:
+        elif rank == 3 or rank == 6:
             self.img = pygame.image.load("assets/Bishop" + addon + ".png")
         elif rank == 4:
             self.img = pygame.image.load("assets/Queen" + addon + ".png")
@@ -55,5 +55,22 @@ class ChessPiece:
         :param posY: integer - row number
         :return: null
         """
+        #Check for non-valid movement for each rank
+        if self.rank == 0:
+            #White First Move
+            if self.row == 2 and posY - self.row > 2:
+                return
+            # Black First Move
+            if self.row == 7 and self.row - posY > 2:
+                return
+
+            # White Subsequent Moves
+            if posY != self.row + 1 and self.white_piece and self.row != 2:
+                return
+            # Black Subsequent Moves
+            if posY != self.row - 1 and self.white_piece == False and self.row != 7:
+                return
+
+
         self.row = posY
         self.col = posX
