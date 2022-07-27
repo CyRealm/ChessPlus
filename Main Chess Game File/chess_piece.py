@@ -34,19 +34,19 @@ class ChessPiece:
         if rank == 0:
             self.img = pygame.image.load("assets/Pawn" + addon + ".png")
         elif rank == 1:
-            self.img = pygame.image.load("assets/imgs/rook_" + addon + ".png")
+            self.img = pygame.image.load("assets/Rook" + addon + ".png")
         elif rank == 2:
-            self.img = pygame.image.load("assets/imgs/horse_" + addon + ".png")
+            self.img = pygame.image.load("assets/Knight" + addon + ".png")
         elif rank == 3:
-            self.img = pygame.image.load("assets/imgs/bishop_" + addon + ".png")
+            self.img = pygame.image.load("assets/Bishop" + addon + ".png")
         elif rank == 4:
-            self.img = pygame.image.load("assets/imgs/queen_" + addon + ".png")
+            self.img = pygame.image.load("assets/Queen" + addon + ".png")
         elif rank == 5:
-            self.img = pygame.image.load("assets/imgs/king_" + addon + ".png")
+            self.img = pygame.image.load("assets/King" + addon + ".png")
 
     def render(self, surface):
-        temp_img = pygame.transform.scale(self.img.copy(), (int(100 * ASPECT_RATIO), int(100 * ASPECT_RATIO)))
-        surface.blit(temp_img, ((self.col - 1) * 100 * ASPECT_RATIO, (self.row - 1) * 100 * ASPECT_RATIO))
+        temp_img = pygame.transform.scale(self.img.copy(), (53, 53))
+        surface.blit(temp_img, ((self.col - 1) * 100 * ASPECT_RATIO + 9, (self.row - 1) * 100 * ASPECT_RATIO + 10))
 
     def move(self, posX, posY):
         """
