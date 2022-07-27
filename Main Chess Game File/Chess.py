@@ -21,47 +21,23 @@ def init():
     global BROWN
     global TAN
     global CHARTREUSE
-    global PawnW1, PawnW2, PawnW3, PawnW4, PawnW5, PawnW6, PawnW7, PawnW8, RookW1, RookW2, KnightW1, \
-        KnightW2, BishopW1, BishopW2, QueenW, KingW, PawnB1, PawnB2, PawnB3, PawnB4, PawnB5, PawnB6, \
-        PawnB7, PawnB8, RookB1, RookB2, KnightB1, KnightB2, BishopB1, BishopB2, QueenB, KingB
+    global all_pieces
 
     WHITE = (255, 255, 255)
     BROWN = (139, 69, 1)
     TAN = (210, 180, 140)
     CHARTREUSE = (127, 255, 0)
+    all_pieces = []
 
-    PawnW1 = ChessPiece(2, 1, 0, True)
-    PawnW2 = ChessPiece(2, 2, 0, True)
-    PawnW3 = ChessPiece(2, 3, 0, True)
-    PawnW4 = ChessPiece(2, 4, 0, True)
-    PawnW5 = ChessPiece(2, 5, 0, True)
-    PawnW6 = ChessPiece(2, 6, 0, True)
-    PawnW7 = ChessPiece(2, 7, 0, True)
-    PawnW8 = ChessPiece(2, 8, 0, True)
-    RookW1 = ChessPiece(1, 1, 1, True)
-    RookW2 = ChessPiece(1, 8, 1, True)
-    KnightW1 = ChessPiece(1, 2, 2, True)
-    KnightW2 = ChessPiece(1, 7, 2, True)
-    BishopW1 = ChessPiece(1, 3, 3, True)
-    BishopW2 = ChessPiece(1, 6, 3, True)
-    QueenW = ChessPiece(1, 5, 4, True)
-    KingW = ChessPiece(1, 4, 5, True)
-    PawnB1 = ChessPiece(7, 1, 0, False)
-    PawnB2 = ChessPiece(7, 2, 0, False)
-    PawnB3 = ChessPiece(7, 3, 0, False)
-    PawnB4 = ChessPiece(7, 4, 0, False)
-    PawnB5 = ChessPiece(7, 5, 0, False)
-    PawnB6 = ChessPiece(7, 6, 0, False)
-    PawnB7 = ChessPiece(7, 7, 0, False)
-    PawnB8 = ChessPiece(7, 8, 0, False)
-    RookB1 = ChessPiece(8, 1, 1, False)
-    RookB2 = ChessPiece(8, 8, 1, False)
-    KnightB1 = ChessPiece(8, 2, 2, False)
-    KnightB2 = ChessPiece(8, 7, 2, False)
-    BishopB1 = ChessPiece(8, 3, 3, False)
-    BishopB2 = ChessPiece(8, 6, 3, False)
-    QueenB = ChessPiece(8, 5, 4, False)
-    KingB = ChessPiece(8, 4, 5, False)
+    for i in range(1,9,1):
+        #Load all White Pawns
+        all_pieces.append(ChessPiece(2, i, 0, True))
+        #Load White Backlines
+        all_pieces.append(ChessPiece(1, i, i, True))
+        # Load Black Pawns
+        all_pieces.append(ChessPiece(7, i, 0, False))
+        # Load Black Backlines
+        all_pieces.append(ChessPiece(8, i, i, False))
 
     pygame.display.set_icon(pygame.image.load(os.path.join("assets", "KnightW.png")).copy())
     pygame.display.set_caption("ChessPlus")
@@ -111,18 +87,22 @@ while True:
             3. Final selection (Identified by a non-negative selectPos and negativePos)
         """
 
-        if selectedPiece is None:  # Case 1
-            if PawnW1.row - 1 == rowNum and PawnW1.col - 1 == colNum:
-                selectedPiece = PawnW1
-                print("Selected Piece " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
-        elif selectedPiece is not None and (selectedPiece.col - 1, selectedPiece.row - 1) == (colNum, rowNum):  # Case 2
-            selectedPiece = None
-            print("Deselected Piece ")
-        else:  # Case 3
-            print("Moved Piece from " + str(INDEX_TO_GRID[selectedPiece.col]) + str(selectedPiece.row + 1) \
-                  + " to " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
-            selectedPiece.move(colNum + 1, rowNum + 1)
-            selectedPiece = None
+        for piece in (all_pieces):
+            if selectedPiece is None:  # Case 1
+                if piece.row - 1 == rowNum and piece.col - 1 == colNum:
+                    selectedPiece = piece
+                    print("Selected Piece " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
+                    break
+            elif selectedPiece is not None and (selectedPiece.col - 1, selectedPiece.row - 1) == (colNum, rowNum):  # Case 2
+                selectedPiece = None
+                print("Deselected Piece ")
+                break
+            else:  # Case 3
+                print("Moved Piece from " + str(INDEX_TO_GRID[selectedPiece.col - 1]) + str(selectedPiece.row - 1) \
+                      + " to " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
+                selectedPiece.move(colNum + 1, rowNum + 1)
+                selectedPiece = None
+                break
 
     # Draw board colours
 
@@ -136,39 +116,6 @@ while True:
                 pygame.draw.rect(screen, BROWN,
                                  pygame.Rect(j * 100 * ASPECT_RATIO, i * 100 * ASPECT_RATIO, 100 * ASPECT_RATIO,
                                              100 * ASPECT_RATIO))
-
-    PawnW1.render(screen)
-    PawnW2.render(screen)
-    PawnW3.render(screen)
-    PawnW4.render(screen)
-    PawnW5.render(screen)
-    PawnW6.render(screen)
-    PawnW7.render(screen)
-    PawnW8.render(screen)
-    RookW1.render(screen)
-    RookW2.render(screen)
-    KnightW1.render(screen)
-    KnightW2.render(screen)
-    BishopW1.render(screen)
-    BishopW2.render(screen)
-    QueenW.render(screen)
-    KingW.render(screen)
-    PawnB1.render(screen)
-    PawnB2.render(screen)
-    PawnB3.render(screen)
-    PawnB4.render(screen)
-    PawnB5.render(screen)
-    PawnB6.render(screen)
-    PawnB7.render(screen)
-    PawnB8.render(screen)
-    RookB1.render(screen)
-    RookB2.render(screen)
-    KnightB1.render(screen)
-    KnightB2.render(screen)
-    BishopB1.render(screen)
-    BishopB2.render(screen)
-    QueenB.render(screen)
-    KingB.render(screen)
 
 
     def init(self, row, col, rank, white_piece):
@@ -186,6 +133,8 @@ while True:
         elif rank == 5:
             self.img(pygame.image.load(os.path.join("assets", "KingW.png")))
 
+    for piece in (all_pieces):
+        piece.render(screen)
 
     if selectedPiece is not None:
         pygame.draw.rect(screen, CHARTREUSE, pygame.Rect((selectedPiece.col - 1) * 100 * ASPECT_RATIO,
