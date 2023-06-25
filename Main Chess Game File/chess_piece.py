@@ -40,37 +40,37 @@ class ChessPiece:
             addon = "black"
 
         if rank == 0:
-            self.img = pygame.image.load("assets/imgs/pawn_" + addon + ".png")
+            self.img = pygame.image.load("assets/ogImgs/pawn_" + addon + ".png")
             self.hp = 2
             self.atk = 1
             self.name = "Pawn"
             self.desc = "Temporary Promotion: Temporarily promote to another piece until the end of the turn"
         elif rank == 1 or rank == 8:
-            self.img = pygame.image.load("assets/imgs/rook_" + addon + ".png")
+            self.img = pygame.image.load("assets/ogImgs/rook_" + addon + ".png")
             self.hp = 5
             self.atk = 2
             self.name = "Rook"
             self.desc = "Indomitability: Gain invincibility at the end of the turn which lasts until the start of the player's next turn"
         elif rank == 2 or rank == 7:
-            self.img = pygame.image.load("assets/imgs/knight_" + addon + ".png")
+            self.img = pygame.image.load("assets/ogImgs/knight_" + addon + ".png")
             self.hp = 3
             self.atk = 2
             self.name = "Knight"
             self.desc = "Heroic Charge: Gain the ability to move twice; double damage if an attack is launched on the second move"
         elif rank == 3 or rank == 6:
-            self.img = pygame.image.load("assets/imgs/bishop_" + addon + ".png")
+            self.img = pygame.image.load("assets/ogImgs/bishop_" + addon + ".png")
             self.hp = 3
             self.atk = 2
             self.name = "Bishop"
             self.desc = "Healing Prayer: Heal any unit by hp equal to the Bishop's attack value"
         elif rank == 4:
-            self.img = pygame.image.load("assets/imgs/queen_" + addon + ".png")
+            self.img = pygame.image.load("assets/ogImgs/queen_" + addon + ".png")
             self.hp = 6
             self.atk = 3
             self.name = "Queen"
             self.desc = "Charismatic Aura: Buffs all visible ally units within range of Queen's observation, by double hp and double attack, for 2 turns"
         elif rank == 5:
-            self.img = pygame.image.load("assets/imgs/king_" + addon + ".png")
+            self.img = pygame.image.load("assets/ogImgs/king_" + addon + ".png")
             self.hp = 9
             self.atk = 1
             self.name = "King"
