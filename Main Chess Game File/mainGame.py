@@ -1,15 +1,24 @@
 import pygame
 from chess_piece import *
 from game_board import *
+from enum import IntEnum
+from MainMenu import *
+
 ASPECT_RATIO = 1
 INDEX_TO_GRID = ["A","B","C","D","E","F","G","H"]
 CYAN = (0, 255, 255)
+TAN = (210, 180, 140)
 BLACK_CHESS_IMGS = []
 WHITE_CHESS_IMGS = []
 PAWN = [1,2,3,4,5,6,7,8]
 ROOK = [1,8]
 all_pieces = []
-QUIT = False
+
+class STATE(IntEnum):
+    MENU = 1
+    OPTION = 2
+    GAME = 3
+    QUIT = 4
 
 
 def init():
@@ -22,18 +31,19 @@ def init():
     pygame.init()
 
     # Declaration of Global Variables
-    global WHITE, BLACK, test_piece, board, NEW_BROWN, turnCounter
+    global WHITE, BLACK, test_piece, board, NEW_BROWN, turnCounter, currentState
     WHITE = (255, 255, 255)
     NEW_BROWN = (107, 62, 30)
     BLACK = (0, 0, 0)
 
+    currentState = STATE.MENU
     turnCounter = 0
     board = GameBoard()
 
     # Load in-game music
-    pygame.mixer.music.load("assets/sfx/bgm.mp3")
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)
+    # pygame.mixer.music.load("assets/sfx/bgm.mp3")
+    # pygame.mixer.music.set_volume(0.5)
+    # pygame.mixer.music.play(-1)
     print("------------------------------------------------------------------------------------")
     print("Input 'p' to pause the music")
     print("Input 'r' to resume the music")
@@ -63,19 +73,26 @@ def init():
 if __name__ == "__main__":
     init()
     size = (int((800 + 300) * ASPECT_RATIO), int(800 * ASPECT_RATIO))
-    pygame.display.set_icon(pygame.image.load("assets/imgs/king_black.png").copy())
-    HP = pygame.image.load("assets/imgs/HP.png")
-    SWORD = pygame.image.load("assets/imgs/SWORD.png")
+    pygame.display.set_icon(pygame.image.load("assets/ogImgs/king_black.png").copy())
+    HP = pygame.image.load("assets/ogImgs/HP.png")
+    SWORD = pygame.image.load("assets/ogImgs/SWORD.png")
     screen = pygame.display.set_mode(size)
 
 # In-game Parameters
 selectedPiece = None
 
-while not QUIT:
+while currentState != STATE.QUIT:
+    if currentState == STATE.MENU:
+        currentState = STATE(main_menu(screen))
+        continue
+    elif currentState == STATE.OPTION:
+        currentState = STATE(options(screen))
+        continue
+
     # Check for mouseDown Event
     e = pygame.event.wait()
     if e.type == pygame.QUIT:
-        exit()
+        currentState = STATE.QUIT
     if e.type == pygame.KEYDOWN:
         for line in board.board_obs:
             print(line)
@@ -160,7 +177,7 @@ while not QUIT:
             if (i % 2 == 0 and j % 2 == 0) or (i % 2 == 1 and j % 2 == 1):
                 pygame.draw.rect(screen, WHITE, pygame.Rect(j * 100 * ASPECT_RATIO, i * 100 * ASPECT_RATIO, 100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
             else:
-                pygame.draw.rect(screen, BLACK, pygame.Rect(j * 100 * ASPECT_RATIO, i * 100 * ASPECT_RATIO, 100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
+                pygame.draw.rect(screen, TAN, pygame.Rect(j * 100 * ASPECT_RATIO, i * 100 * ASPECT_RATIO, 100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
 
     for piece in all_pieces:
         piece.render(screen)

@@ -78,8 +78,12 @@ class ChessPiece:
 
     def render(self, surface):
         if self.active:
-            temp_img = pygame.transform.scale(self.img.copy(), (100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
-            surface.blit(temp_img, ((self.col - 1) * 100 * ASPECT_RATIO, (self.row - 1) * 100 * ASPECT_RATIO))
+            temp_img = pygame.transform.scale(self.img.copy(), (100 * ASPECT_RATIO * 0.85, 100 * ASPECT_RATIO * 0.85))
+            centreX = (self.col - 1) * 100 * ASPECT_RATIO + 100 * ASPECT_RATIO / 2
+            centreY = (self.row - 1) * 100 * ASPECT_RATIO + 100 * ASPECT_RATIO / 2
+            new_X = centreX - temp_img.get_width() / 2
+            new_Y = centreY - temp_img.get_height() / 2
+            surface.blit(temp_img, (new_X, new_Y))
 
     def evalCounter(self, board, currentCol, currentRow, newCol, newRow):
         old_col_L = currentCol - 2
