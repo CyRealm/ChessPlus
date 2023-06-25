@@ -79,7 +79,37 @@ class ChessPiece:
     def render(self, surface):
         if self.active:
             temp_img = pygame.transform.scale(self.img.copy(), (100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
-            surface.blit(temp_img, ((self.col - 1) * 100, (self.row - 1) * 100))
+            surface.blit(temp_img, ((self.col - 1) * 100 * ASPECT_RATIO, (self.row - 1) * 100 * ASPECT_RATIO))
+
+    def evalCounter(self, board, currentCol, currentRow, newCol, newRow):
+        old_col_L = currentCol - 2
+        old_col_R = currentCol
+        new_col_L = newCol - 2
+        new_col_R = newCol
+        # White or Black? Counter-able Squares
+        if self.white_piece:
+            old_row = currentRow
+            new_row = newRow
+            if 0 <= old_col_L <= 7:
+                board.counterValues[old_col_L][old_row][0] = 0
+            if 0 <= old_col_R <= 7:
+                board.counterValues[old_col_R][old_row][0] = 0
+            if 0 <= new_col_L <= 7:
+                board.counterValues[new_col_L][new_row][0] += self.atk
+            if 0 <= new_col_R <= 7:
+                board.counterValues[new_col_R][new_row][0] += self.atk
+        else:
+            old_row = currentRow - 2
+            new_row = newRow - 2
+            if 0 <= old_col_L <= 7:
+                board.counterValues[old_col_L][old_row][1] = 0
+            if 0 <= old_col_R <= 7:
+                board.counterValues[old_col_R][old_row][1] = 0
+            if 0 <= new_col_L <= 7:
+                board.counterValues[new_col_L][new_row][1] += self.atk
+            if 0 <= new_col_R <= 7:
+                board.counterValues[new_col_R][new_row][1] += self.atk
+
 
     def move(self, posX, posY, gameB, taking_piece = None):
         """
@@ -100,32 +130,33 @@ class ChessPiece:
                 # UNLESS IT'S TO TAKE A PIECE
                 if (posY == self.row + 1 and self.white_piece and abs(col_diff) == 1 and taking_piece is not None) or \
                         (posY == self.row - 1 and not self.white_piece and abs(col_diff) == 1 and taking_piece is not None):
-                    if taking_piece.white_piece != self.white_piece:
-                        taking_piece.hp -= self.atk
-                        if taking_piece.hp <= 0:
-                            taking_piece.active = False
-                    else:
-                        return
+                    if taking_piece.white_piece == self.white_piece:
+                        return False
+                    taking_piece.hp -= self.atk
+                    # Counter-attack
+                    self.hp -= gameB.counterValues[posX - 1][posY - 1][int(self.white_piece)]
+                    if taking_piece.hp <= 0:
+                        taking_piece.active = False
                 else:
-                    return
+                    return False
             else:
                 # White First move
                 if self.firstMove and abs(posY - self.row) > 2:
-                    return
+                    return False
 
                 # White Subsequent moves
                 if posY != self.row + 1 and self.white_piece and self.row != 2:
-                    return
+                    return False
                 # Black Subsequent moves
                 if posY != self.row - 1 and not self.white_piece and self.row != 7:
-                    return
+                    return False
 
                 for tempR in range(0, row_diff, int(row_diff/abs(row_diff))):
                     pathState.append(gameB.boardState[posX - 1][posY - 1 + tempR])
 
                 # Check for Road Blocks
                 if pathState.count(None) != len(pathState):
-                    return
+                    return False
 
 
         if self.rank == 1 or self.rank == 8:
@@ -134,7 +165,7 @@ class ChessPiece:
             pathState = []
             # At least one of the row or column has to match the original
             if self.row != posY and self.col != posX:
-                return
+                return False
 
             for j in range(0, col_diff if col_diff != 0 else 1, 1 if col_diff >= 0 else -1):
                 for i in range(0, row_diff if row_diff != 0 else 1, 1 if row_diff >= 0 else -1):
@@ -143,13 +174,16 @@ class ChessPiece:
             pathState.pop(0)
 
             if pathState.count(None) != len(pathState):
-                return
+                return False
 
             if taking_piece is not None:
-                if taking_piece.white_piece != self.white_piece:
-                    taking_piece.hp -= self.atk
-                    if taking_piece.hp <= 0:
-                        taking_piece.active = False
+                if taking_piece.white_piece == self.white_piece:
+                    return False
+                taking_piece.hp -= self.atk
+                # Counter-attack
+                self.hp -= gameB.counterValues[posX - 1][posY - 1][int(self.white_piece)]
+                if taking_piece.hp <= 0:
+                    taking_piece.active = False
 
         if self.rank == 2 or self.rank == 7:
             # Hypoteneuse ^ 2 is 5
@@ -157,17 +191,18 @@ class ChessPiece:
             col_diff = self.col - posX
             pathState = []
             if row_diff ** 2 + col_diff ** 2 != 5:
-                return
+                return False
 
             pathState.append(gameB.boardState[posX - 1][posY - 1])
 
             if pathState.count(None) != len(pathState) and taking_piece is not None:
-                if taking_piece.white_piece != self.white_piece:
-                    taking_piece.hp -= self.atk
-                    if taking_piece.hp <= 0:
-                        taking_piece.active = False
-                else:
-                    return
+                if taking_piece.white_piece == self.white_piece:
+                    return False
+                taking_piece.hp -= self.atk
+                # Counter-attack
+                self.hp -= gameB.counterValues[posX - 1][posY - 1][int(self.white_piece)]
+                if taking_piece.hp <= 0:
+                    taking_piece.active = False
 
         if self.rank == 3 or self.rank == 6:
             # row_diff and col_diff has to be the same
@@ -176,7 +211,7 @@ class ChessPiece:
             pathState = []
 
             if abs(row_diff) != abs(col_diff):
-                return
+                return False
 
             row_pathing = int(row_diff / abs(row_diff))
             col_pathing = int(col_diff / abs(col_diff))
@@ -188,13 +223,16 @@ class ChessPiece:
 
             if pathState.count(None) != len(pathState):
                 # 1 possibility - getting blocked
-                return
+                return False
 
             if taking_piece is not None:
-                if taking_piece.white_piece != self.white_piece:
-                    taking_piece.hp -= self.atk
-                    if taking_piece.hp <= 0:
-                        taking_piece.active = False
+                if taking_piece.white_piece == self.white_piece:
+                    return False
+                taking_piece.hp -= self.atk
+                # Counter-attack
+                self.hp -= gameB.counterValues[posX - 1][posY - 1][int(self.white_piece)]
+                if taking_piece.hp <= 0:
+                    taking_piece.active = False
 
         if self.rank == 4:
             # row_diff and col_diff has to be the same or only one gets changed
@@ -202,7 +240,7 @@ class ChessPiece:
             col_diff = self.col - posX
             pathState = []
             if abs(row_diff) != abs(col_diff) and (row_diff != 0 and col_diff != 0):
-                return
+                return False
 
             theta = math.atan2(-row_diff, col_diff)
             rad = int(math.sqrt(row_diff**2 + col_diff**2))
@@ -215,13 +253,16 @@ class ChessPiece:
             pathState.pop(0)
 
             if pathState.count(None) != len(pathState):
-                return
+                return False
 
             if taking_piece is not None:
-                if taking_piece.white_piece != self.white_piece:
-                    taking_piece.hp -= self.atk
-                    if taking_piece.hp <= 0:
-                        taking_piece.active = False
+                if taking_piece.white_piece == self.white_piece:
+                    return False
+                taking_piece.hp -= self.atk
+                # Counter-attack
+                self.hp -= gameB.counterValues[posX - 1][posY - 1][int(self.white_piece)]
+                if taking_piece.hp <= 0:
+                    taking_piece.active = False
 
 
         if self.rank == 5:
@@ -229,20 +270,28 @@ class ChessPiece:
             row_diff = self.row - posY
             col_diff = self.col - posX
             if row_diff ** 2 + col_diff ** 2 > 2:
-                return
+                return False
 
             if taking_piece is not None:
                 if taking_piece.white_piece == self.white_piece:
-                    return
-                else:
-                    taking_piece.hp -= self.atk
-                    if taking_piece.hp <= 0:
-                        taking_piece.active = False
+                    return False
+                taking_piece.hp -= self.atk
+                # Counter-attack
+                self.hp -= gameB.counterValues[posX - 1][posY - 1][int(self.white_piece)]
+                if taking_piece.hp <= 0:
+                    taking_piece.active = False
 
         self.firstMove = False
         if taking_piece is None or taking_piece.active is False:
+            if self.rank == 0:
+                self.evalCounter(gameB, self.col, self.row, posX, posY)
             gameB.boardState[self.col - 1][self.row - 1] = None
             self.row = posY
             self.col = posX
             gameB.boardState[self.col - 1][self.row - 1] = self
+
+        # Dies to counter-attack
+        if self.hp <= 0:
+            self.active = False
+        return True
 

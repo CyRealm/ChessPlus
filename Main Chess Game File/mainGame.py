@@ -22,15 +22,16 @@ def init():
     pygame.init()
 
     # Declaration of Global Variables
-    global WHITE, BLACK, test_piece, board, NEW_BROWN
+    global WHITE, BLACK, test_piece, board, NEW_BROWN, turnCounter
     WHITE = (255, 255, 255)
     NEW_BROWN = (107, 62, 30)
     BLACK = (0, 0, 0)
 
+    turnCounter = 0
     board = GameBoard()
 
     # Load in-game music
-    pygame.mixer.music.load("../../../assets/sfx/bgm.mp3")
+    pygame.mixer.music.load("assets/sfx/bgm.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
     print("------------------------------------------------------------------------------------")
@@ -62,9 +63,9 @@ def init():
 if __name__ == "__main__":
     init()
     size = (int((800 + 300) * ASPECT_RATIO), int(800 * ASPECT_RATIO))
-    pygame.display.set_icon(pygame.image.load("../../../assets/imgs/king_black.png").copy())
-    HP = pygame.image.load("../../../assets/imgs/HP.png")
-    SWORD = pygame.image.load("../../../assets/imgs/SWORD.png")
+    pygame.display.set_icon(pygame.image.load("assets/imgs/king_black.png").copy())
+    HP = pygame.image.load("assets/imgs/HP.png")
+    SWORD = pygame.image.load("assets/imgs/SWORD.png")
     screen = pygame.display.set_mode(size)
 
 # In-game Parameters
@@ -95,41 +96,41 @@ while not QUIT:
         colNum = int(mouseX / (100 * ASPECT_RATIO))
         # print("Row Clicked: " + str(rowNum + 1))
         # print("Column Clicked: " + str(colNum + 1))
-
-
+        if rowNum not in range(0, 8, 1) or colNum not in range(0, 8, 1):
+            continue
+        piece = board.boardState[colNum][rowNum]
         """
         3 Cases:
             1. First selection (identified by -1 values in selectPos)
             2. Deselection (identified by the same position as selectPos)
             3. Final selection (identified by a non-negative selectPos and a negative dropPos)
         """
-        for piece in all_pieces:
-            if not piece.active:
-                continue
+        if piece is not None and piece.active:
+
             if selectedPiece is None: # Case 1
-                if piece.row - 1 == rowNum and piece.col - 1 == colNum:
-                    selectedPiece = piece
-                    print("Selected Piece " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
-                    break
+                if piece.white_piece is (turnCounter % 2 == 0):
+                    if piece.row - 1 == rowNum and piece.col - 1 == colNum:
+                        selectedPiece = piece
+                        print("Selected Piece " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
             elif selectedPiece is not None and (selectedPiece.col - 1, selectedPiece.row - 1) == (colNum, rowNum): # Case 2
                 selectedPiece = None
                 print("Deselected Piece")
-                break
-            else: # Case 3
+            else:
                 # If the move lands on another piece
                 if piece.row - 1 == rowNum and piece.col - 1 == colNum:
-                    print("Moved Piece from " + str(INDEX_TO_GRID[selectedPiece.col - 1]) + str(selectedPiece.row)\
+                    print("Moved Piece from " + str(INDEX_TO_GRID[selectedPiece.col - 1]) + str(selectedPiece.row) \
                           + " to " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
-                    selectedPiece.move(colNum + 1, rowNum + 1, board, piece)
-                    selectedPiece = None
-                    break
+                    if selectedPiece.move(colNum + 1, rowNum + 1, board, piece):
+                        selectedPiece = None
+                        turnCounter += 1
 
-                # If the move lands on an empty square
-                if all_pieces.index(piece) == len(all_pieces) - 1:
-                    print("Moved Piece from " + str(INDEX_TO_GRID[selectedPiece.col - 1]) + str(selectedPiece.row)\
-                          + " to " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
-                    selectedPiece.move(colNum + 1, rowNum + 1, board)
-                    selectedPiece = None
+        elif piece is None and selectedPiece is not None: # Case 3
+            # If the move lands on an empty square
+            print("Moved Piece from " + str(INDEX_TO_GRID[selectedPiece.col - 1]) + str(selectedPiece.row)\
+                  + " to " + str(INDEX_TO_GRID[colNum]) + str(rowNum + 1))
+            if selectedPiece.move(colNum + 1, rowNum + 1, board):
+                turnCounter += 1
+            selectedPiece = None
 
 
     board.Update(all_pieces)
@@ -178,7 +179,7 @@ while not QUIT:
         mouse_col = math.floor(mouse_pos[0] / (100 * ASPECT_RATIO))
         mouse_row = math.floor(mouse_pos[1] / (100 * ASPECT_RATIO))
         located_piece = board.boardState[mouse_col][mouse_row]
-        if located_piece is not None:
+        if located_piece is not None and located_piece.active:
             # Image rescaling
             rescaled_piece_img = pygame.transform.scale(located_piece.img, (100 * ASPECT_RATIO, 100 * ASPECT_RATIO))
             rescaled_HP_img = pygame.transform.scale(HP, (64 * ASPECT_RATIO, 64 * ASPECT_RATIO))

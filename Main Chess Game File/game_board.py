@@ -6,9 +6,27 @@ class GameBoard:
     def __init__(self):
         self.boardState = [[None for i in range(8)] for i in range(8)]  # Format [colNum, rowNum]
         self.board_obs = [[0.0 for i in range(8)] for i in range(8)] # 0 = Unobserved | Decimal = Black | Whole = White
+        self.counterValues = [[[0.0, 0.0] for i in range(8)] for i in range(8)] # [colNum, rowNum, alliance[W, B]]
 
     def addPiece(self, chessPiece):
         self.boardState[chessPiece.col - 1][chessPiece.row - 1] = chessPiece
+        # First time logging counter values
+        if chessPiece.rank == 0:  # Pawn
+            obs_col_L = chessPiece.col - 2
+            obs_col_R = chessPiece.col
+            # White or Black? Counter-able Squares
+            if chessPiece.white_piece:
+                obs_row = chessPiece.row
+                if 0 <= obs_col_L <= 7:
+                    self.counterValues[obs_col_L][obs_row][0] += chessPiece.atk
+                if 0 <= obs_col_R <= 7:
+                    self.counterValues[obs_col_R][obs_row][0] += chessPiece.atk
+            else:
+                obs_row = chessPiece.row - 2
+                if 0 <= obs_col_L <= 7:
+                    self.counterValues[obs_col_L][obs_row][1] += chessPiece.atk
+                if 0 <= obs_col_R <= 7:
+                    self.counterValues[obs_col_R][obs_row][1] += chessPiece.atk
 
     def Update(self, pieces):
         self.board_obs = [[0.0 for i in range(8)] for i in range(8)]  # 0 = Unobserved | Decimal = Black | Whole = White
@@ -18,7 +36,7 @@ class GameBoard:
                 if piece.rank == 0:                         # Pawn
                     obs_col_L = piece.col - 2
                     obs_col_R = piece.col
-                    # White or Black?
+                    # White or Black? Observed Squares
                     if piece.white_piece:
                         obs_row = piece.row
                         if 0 <= obs_col_L <= 7:
