@@ -1,5 +1,5 @@
 import math
-from ChessPiece import *
+from chess_piece import *
 
 class GameBoard:
 
@@ -7,6 +7,8 @@ class GameBoard:
         self.boardState = [[None for i in range(8)] for i in range(8)]  # Format [colNum, rowNum]
         self.board_obs = [[0.0 for i in range(8)] for i in range(8)] # 0 = Unobserved | Decimal = Black | Whole = White
         self.counterValues = [[[0.0, 0.0] for i in range(8)] for i in range(8)] # [colNum, rowNum, alliance[W, B]]
+        self.whiteCastle = True
+        self.blackCastle = True
 
     def addPiece(self, chessPiece):
         self.boardState[chessPiece.col - 1][chessPiece.row - 1] = chessPiece
@@ -33,8 +35,7 @@ class GameBoard:
         for piece in pieces:
             if piece.active:
                 # Check observations
-                # Pawn
-                if piece.rank == 0:
+                if piece.rank == 0:                         # Pawn
                     obs_col_L = piece.col - 2
                     obs_col_R = piece.col
                     # White or Black? Observed Squares
@@ -51,8 +52,7 @@ class GameBoard:
                         if 0 <= obs_col_R <= 7:
                             self.board_obs[obs_col_R][obs_row] += 0.01
 
-                # Rook
-                if piece.rank == 1 or piece.rank == 8:
+                if piece.rank == 1 or piece.rank == 8:      # Rook
                     possibleAngles = [0, 2, 4, 6]
                     offLimitAngles = []
                     for r in range(1, 8, 1):
@@ -76,8 +76,7 @@ class GameBoard:
                             if self.boardState[obs_col][obs_row] is not None:
                                 offLimitAngles.append(angle)
 
-                # Horse
-                if piece.rank == 2 or piece.rank == 7:
+                if piece.rank == 2 or piece.rank == 7:      # Horse
                     possibleAngles = [i for i in range(8)]
                     for angle in possibleAngles:
                         theta = ((int(angle / 2) * 90 - 30) + (angle % 2) * 60) * math.pi / 180
@@ -94,8 +93,8 @@ class GameBoard:
                         else:
                             self.board_obs[obs_col][obs_row] += 0.01
 
-                # Bishop
-                if piece.rank == 3 or piece.rank == 6:
+
+                if piece.rank == 3 or piece.rank == 6:      # Bishop
                     possibleAngles = [1, 3, 5, 7]
                     offLimitAngles = []
                     for r in range(1, 8, 1):
@@ -119,8 +118,7 @@ class GameBoard:
                             if self.boardState[obs_col][obs_row] is not None:
                                 offLimitAngles.append(angle)
 
-                # Queen
-                if piece.rank == 4:
+                if piece.rank == 4:                         # Queen
                     # Queen can observe 8 possible angles, 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°
                     # 0, pi/4, pi/2, 3pi/4, pi, 5pi/4, 3pi/2, 7pi/4
                     possibleAngles = [i for i in range(8)]
@@ -146,8 +144,8 @@ class GameBoard:
                             if self.boardState[obs_col][obs_row] is not None:
                                 offLimitAngles.append(angle)
 
-                # King
-                if piece.rank == 5:
+
+                if piece.rank == 5:                         # King
                     possibleAngles = [i for i in range(8)]
                     for angle in possibleAngles:
                         theta = angle * 45 * math.pi / 180
