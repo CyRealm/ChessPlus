@@ -7,6 +7,8 @@ class GameBoard:
         self.boardState = [[None for i in range(8)] for i in range(8)]  # Format [colNum, rowNum]
         self.board_obs = [[0.0 for i in range(8)] for i in range(8)] # 0 = Unobserved | Decimal = Black | Whole = White
         self.counterValues = [[[0.0, 0.0] for i in range(8)] for i in range(8)] # [colNum, rowNum, alliance[W, B]]
+        self.whiteCastle = True
+        self.blackCastle = True
 
     def addPiece(self, chessPiece):
         self.boardState[chessPiece.col - 1][chessPiece.row - 1] = chessPiece

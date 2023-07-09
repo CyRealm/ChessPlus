@@ -85,6 +85,43 @@ class ChessPiece:
             new_Y = centreY - temp_img.get_height() / 2
             surface.blit(temp_img, (new_X, new_Y))
 
+    def castle(self, target, gameB):
+        target = ChessPiece(target)
+        # Fails if either piece already moved
+        if not self.firstMove or not target.firstMove:
+            return False
+        # Fails if there are still pieces in between
+        col_diff = self.col - target.col
+        pathState = []
+        pathObs = []
+        for i in range(0, col_diff if col_diff != 0 else 1, 1 if col_diff >= 0 else -1):
+            pathState.append(gameB.boardState[target.col - 1 + i][self.row - 1])
+            pathObs.append(gameB.board_obs[target.col - 1 + i][self.row - 1])
+        if pathState.count(None) != len(pathState):
+            return False
+        # Fails if any spots are currently being observed by the opponent
+        if self.white_piece:
+            for obs in pathObs:
+                if int(obs) != obs:
+                    return False
+        else:
+            for obs in pathObs:
+                if obs > 1:
+                    return False
+
+        kingMove = self.col + (target.col - self.col / abs(target.col - self.col)) * 2
+        rookMove = self.col + target.col - self.col / abs(target.col - self.col)
+
+        gameB.boardState[self.col - 1][self.row - 1] = None
+        gameB.boardState[target.col - 1][target.row - 1] = None
+        self.col = kingMove
+        target.col = rookMove
+        gameB.boardState[self.col - 1][self.row - 1] = self
+        gameB.boardState[target.col - 1][target.row - 1] = target
+        self.firstMove = False
+        target.firstMove = False
+
+
     def evalCounter(self, board, currentCol, currentRow, newCol, newRow):
         old_col_L = currentCol - 2
         old_col_R = currentCol
@@ -95,9 +132,9 @@ class ChessPiece:
             old_row = currentRow
             new_row = newRow
             if 0 <= old_col_L <= 7:
-                board.counterValues[old_col_L][old_row][0] = 0
+                board.counterValues[old_col_L][old_row][0] -= self.atk
             if 0 <= old_col_R <= 7:
-                board.counterValues[old_col_R][old_row][0] = 0
+                board.counterValues[old_col_R][old_row][0] -= self.atk
             if 0 <= new_col_L <= 7:
                 board.counterValues[new_col_L][new_row][0] += self.atk
             if 0 <= new_col_R <= 7:
@@ -106,14 +143,16 @@ class ChessPiece:
             old_row = currentRow - 2
             new_row = newRow - 2
             if 0 <= old_col_L <= 7:
-                board.counterValues[old_col_L][old_row][1] = 0
+                board.counterValues[old_col_L][old_row][1] -= self.atk
             if 0 <= old_col_R <= 7:
-                board.counterValues[old_col_R][old_row][1] = 0
+                board.counterValues[old_col_R][old_row][1] -= self.atk
             if 0 <= new_col_L <= 7:
                 board.counterValues[new_col_L][new_row][1] += self.atk
             if 0 <= new_col_R <= 7:
                 board.counterValues[new_col_R][new_row][1] += self.atk
 
+    def adjustAtk(self, adjustment):
+        self.atk += adjustment
 
     def move(self, posX, posY, gameB, taking_piece = None):
         """
@@ -274,6 +313,8 @@ class ChessPiece:
             row_diff = self.row - posY
             col_diff = self.col - posX
             if row_diff ** 2 + col_diff ** 2 > 2:
+                # Exception: When castling
+
                 return False
 
             if taking_piece is not None:
@@ -297,5 +338,11 @@ class ChessPiece:
         # Dies to counter-attack
         if self.hp <= 0:
             self.active = False
+
+        for col in gameB.counterValues:
+            text = ""
+            for row in col:
+                text += str(int(row[1]))
+            print(text)
         return True
 
