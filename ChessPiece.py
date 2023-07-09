@@ -2,7 +2,7 @@ import math
 
 import pygame
 from GameBoard import *
-aspect_ratio = 0.8
+aspect_ratio = 0.9
 
 class ChessPiece:
     """
@@ -44,37 +44,37 @@ class ChessPiece:
             self.hp = 2
             self.atk = 1
             self.name = "Pawn"
-            self.desc = "Temporary Promotion: Temporarily promote to another piece until the end of the turn"
+            self.desc = "Temporary Promotion:\nTemporarily promote to another piece until the end of the turn."
         elif rank == 1 or rank == 8:
             self.img = pygame.image.load("assets/Rook" + addon + ".png")
             self.hp = 5
             self.atk = 2
             self.name = "Rook"
-            self.desc = "Indomitability: Gain invincibility at the end of the turn - lasts until the start of the player's next turn"
+            self.desc = "Indomitability:\nGain invincibility at the end of the turn - lasts until the start of the player's next turn."
         elif rank == 2 or rank == 7:
             self.img = pygame.image.load("assets/Knight" + addon + ".png")
             self.hp = 3
             self.atk = 2
             self.name = "Knight"
-            self.desc = "Heroic Charge: Gain the ability to move twice; half damage if an attack is launched on the second move"
+            self.desc = "Heroic Charge:\nGain the ability to move twice; half damage if an attack is launched on the second move."
         elif rank == 3 or rank == 6:
             self.img = pygame.image.load("assets/Bishop" + addon + ".png")
             self.hp = 3
             self.atk = 2
             self.name = "Bishop"
-            self.desc = "Healing Prayer: Heal any unit by hp equal to the Bishop's attack value"
+            self.desc = "Healing Prayer:\nHeal any unit by hp equal to the Bishop's attack value."
         elif rank == 4:
             self.img = pygame.image.load("assets/Queen" + addon + ".png")
             self.hp = 6
             self.atk = 3
             self.name = "Queen"
-            self.desc = "Charismatic Aura: Buffs all ally units within range of Queen's observation, by double attack and hp, for 2 turns"
+            self.desc = "Charismatic Aura:\nBuffs all ally units within range of Queen's observation, by double attack and hp, for 2 turns."
         elif rank == 5:
             self.img = pygame.image.load("assets/King" + addon + ".png")
             self.hp = 9
             self.atk = 1
             self.name = "King"
-            self.desc = "Tactical Exchange: Permits positional swap with any single ally unit"
+            self.desc = "Tactical Exchange:\nPermits positional swap with any single ally unit."
 
     def render(self, surface):
         if self.active:

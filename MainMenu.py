@@ -1,5 +1,5 @@
 import pygame
-aspect_ratio = 0.8
+aspect_ratio = 0.9
 rescaled_bg_img = pygame.transform.scale(pygame.image.load("assets/Main_bg.png"),  (1100 * aspect_ratio, 800 * aspect_ratio))
 
 class Button():
@@ -56,7 +56,7 @@ def main_menu(screen):
     menu_mouse_pos = pygame.mouse.get_pos()
     pygame.font.init()
     title_font = pygame.font.SysFont('Constantia', int(120 * aspect_ratio))
-    version_font = pygame.font.SysFont('Consolas', int(24 * aspect_ratio))
+    version_font = pygame.font.SysFont('Consolas', int(20 * aspect_ratio))
     screen.blit(rescaled_bg_img, (0,0))
 
     # Buttons recting
@@ -80,7 +80,7 @@ def main_menu(screen):
     menu_text = title_font.render("ChessPlus", True, "White")
     screen.blit(menu_text, ((screen.get_width() / 2 - menu_text.get_width() / 2), (screen.get_height() / 2) - 220 * aspect_ratio ))
     game_version_text = version_font.render("Version Alpha", True, "White")
-    screen.blit(game_version_text, (screen.get_width() - (170 * aspect_ratio), screen.get_height() - (31 * aspect_ratio)))
+    screen.blit(game_version_text, (screen.get_width() - (150 * aspect_ratio), screen.get_height() - (24 * aspect_ratio)))
 
     play_button = Button(image=play_btn, text_input="PLAY", font=pygame.font.SysFont('Calibri',
                             int(44 * aspect_ratio)), base_colour="White", hovering_colour="Green")
@@ -106,4 +106,3 @@ def main_menu(screen):
 
     pygame.display.flip()
     return 1
-

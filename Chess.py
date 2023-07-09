@@ -1,5 +1,8 @@
+import math
+
 import pygame
 import time
+import datetime
 
 from ChessPiece import *
 from GameBoard import *
@@ -12,7 +15,7 @@ class state(IntEnum):
     game = 3
     quit = 4
 
-aspect_ratio = 0.8
+aspect_ratio = 0.9
 index_to_grid =["A", "B", "C", "D", "E", "F", "G", "H"]
 
 def init():
@@ -23,6 +26,10 @@ def init():
     """
     # Preload all Packages
     pygame.init()
+
+    # Set caption and icon
+    pygame.display.set_icon(pygame.image.load("assets/KnightW.png").copy())
+    pygame.display.set_caption("Chess+")
 
     # Declaration of Global Variables
     global WHITE, BLACK, BROWN, NEW_BROWN, TAN, CHARTREUSE, all_pieces, current_state, turnCounter, board, \
@@ -44,7 +51,7 @@ def init():
     game_started = False
 
     # Load in-game music
-    # pygame.mixer.music.load("assets/sfx/bgm.mp3")
+    # pygame.mixer.music.load("assets/bgm.mp3")
     # pygame.mixer.music.set_volume(0.5)
     # pygame.mixer.music.play(-1)
     print("------------------------------------------------------------------------------------")
@@ -72,9 +79,6 @@ def init():
         all_pieces.append(temp_piece)
         board.addPiece(temp_piece)
 
-    pygame.display.set_icon(pygame.image.load("assets/KnightW.png").copy())
-    pygame.display.set_caption("Chess+")
-
 if __name__ == "__main__":
     init()
     size = (int((1100) * aspect_ratio), int(800 * aspect_ratio))
@@ -90,20 +94,6 @@ while current_state != state.quit:
     elif current_state == state.option:
         current_state = state(options(screen))
         continue
-
-    global new_white_timer
-    if game_started:
-        clock.tick()
-        if turnCounter % 2 == 0:
-            white_timer -= float(clock.get_time()) / 1000.0
-        if turnCounter % 2 == 1:
-            black_timer -= float(clock.get_time()) / 1000.0
-        if white_timer < 0:
-            current_state = state.quit
-            print("black won")
-        if black_timer < 0:
-            current_state = state.quit
-            print("white won")
 
     # Check for mouseDown Event
     for e in pygame.event.get():
@@ -201,14 +191,12 @@ while current_state != state.quit:
                         100 * aspect_ratio, 100 * aspect_ratio + 1))
 
     # Piece Info-chart
-    pygame.draw.rect(screen, NEW_BROWN, pygame.Rect(800 * aspect_ratio - 1, 0, screen.get_width() - 800 * aspect_ratio + 5
-                                                    , 800 * aspect_ratio))
-    pygame.draw.line(screen, WHITE, (800 * aspect_ratio - 1, 250 * aspect_ratio), (screen.get_width(), 250 * aspect_ratio))
-    pygame.draw.line(screen, WHITE, (800 * aspect_ratio - 1, 400 * aspect_ratio), (screen.get_width(), 400 * aspect_ratio))
-    pygame.draw.line(screen, WHITE, (800 * aspect_ratio - 1, 600 * aspect_ratio), (screen.get_width(), 600 * aspect_ratio))
-    font = pygame.font.SysFont("sans", 36)
-    new_white_timer = font.render(str(int(white_timer)), False, (0, 0, 0))
-    screen.blit(new_white_timer, (800, 600))
+    pygame.draw.rect(screen, NEW_BROWN, pygame.Rect(799 * aspect_ratio, 0, math.ceil(302 * aspect_ratio), 800 * aspect_ratio))
+    pygame.draw.rect(screen, WHITE, pygame.Rect(799 * aspect_ratio, 700 * aspect_ratio, 151 * aspect_ratio, 102 * aspect_ratio))
+    pygame.draw.rect(screen, BLACK, pygame.Rect(math.ceil(948 * aspect_ratio), 700 * aspect_ratio, 153 * aspect_ratio,
+                                                math.ceil(101 * aspect_ratio)))
+    pygame.draw.line(screen, WHITE, (799 * aspect_ratio, 250 * aspect_ratio), (screen.get_width(), 250 * aspect_ratio))
+    pygame.draw.line(screen, WHITE, (799 * aspect_ratio, 400 * aspect_ratio), (screen.get_width(), 400 * aspect_ratio))
 
     mouse_pos = pygame.mouse.get_pos()
     if mouse_pos[0] < 800 * aspect_ratio:
@@ -224,11 +212,11 @@ while current_state != state.quit:
 
             # Text type
             pygame.font.init()
-            font = pygame.font.SysFont('Calibri', int(50 * aspect_ratio))
-            font_desc = pygame.font.SysFont('Calibri', int(29 * aspect_ratio))
-            piece_name = font.render(located_piece.name, False, (0, 0, 0))
-            piece_hp = font.render(str(int(located_piece.hp)), False, (0, 0, 0))
-            piece_atk = font.render(str(int(located_piece.atk)), False, (0, 0, 0))
+            font_stats = pygame.font.SysFont('Calibri', int(50 * aspect_ratio))
+            font_desc = pygame.font.SysFont('Calibri', int(26 * aspect_ratio))
+            piece_name = font_stats.render(located_piece.name, False, (0, 0, 0))
+            piece_hp = font_stats.render(str(int(located_piece.hp)), False, (0, 0, 0))
+            piece_atk = font_stats.render(str(int(located_piece.atk)), False, (0, 0, 0))
 
             # Image display
             center_align = (screen.get_width() + 800 * aspect_ratio) / 2
@@ -243,7 +231,7 @@ while current_state != state.quit:
             # Description display
             def desc(text, pos):
                 words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
-                space = font.size(' ')[0]  # The width of a space.
+                space = font_stats.size(' ')[0]  # The width of a space.
                 max_width, max_height = screen.get_size()
                 x, y = pos
                 for line in words:
@@ -257,7 +245,40 @@ while current_state != state.quit:
                         x += word_width + space
                     x = pos[0]  # Reset the x.
                     y += word_height  # Start on new row.
-            desc(located_piece.desc, (800 * aspect_ratio + (7 * aspect_ratio), 800 * aspect_ratio - (185 * aspect_ratio)))
+            desc(located_piece.desc, (800 * aspect_ratio + (7 * aspect_ratio), 800 * aspect_ratio - (235 * aspect_ratio)))
+
+    # Timer
+
+    font_win = pygame.font.SysFont('Calibri', int(100 * aspect_ratio))
+    white_win = font_win.render("WHITE WON", False, (255, 255, 255))
+    black_win = font_win.render("BLACK WON", False, (0, 0, 0))
+    font_time = pygame.font.SysFont("sans", int(48 * aspect_ratio))
+
+    new_white_timer = font_time.render(str(time.strftime("%M:%S", time.gmtime(white_timer))), False, (0, 0, 0))
+    screen.blit(new_white_timer,
+                (screen.get_width() / 2 - new_white_timer.get_width() / 2 + (325 * aspect_ratio), 724 * aspect_ratio))
+    new_black_timer = font_time.render(str(time.strftime("%M:%S", time.gmtime(black_timer))), False, (255, 255, 255))
+    screen.blit(new_black_timer,
+                (screen.get_width() / 2 - new_black_timer.get_width() / 2 + (475 * aspect_ratio), 724 * aspect_ratio))
+
+    if game_started:
+        clock.tick()
+        if turnCounter % 2 == 0:
+            white_timer -= float(clock.get_time()) / 1000.0
+        if turnCounter % 2 == 1:
+            black_timer -= float(clock.get_time()) / 1000.0
+        if white_timer < 0: # Black wins due to time
+            screen.blit(black_win, (400 * aspect_ratio - white_win.get_width() / 2, screen.get_height() / 2 -
+                                     white_win.get_height() / 2))
+            pygame.display.flip()
+            pygame.time.wait(5000)
+            current_state = state.quit
+        if black_timer < 0: # White wins due to time
+            screen.blit(white_win, ((400 * aspect_ratio - white_win.get_width() / 2, screen.get_height() / 2 -
+                                     white_win.get_height() / 2)))
+            pygame.display.flip()
+            pygame.time.wait(5000)
+            current_state = state.quit
 
     # Selected Piece Outline
     if selected_piece is not None:
