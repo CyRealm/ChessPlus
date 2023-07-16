@@ -104,12 +104,17 @@ if __name__ == "__main__":
     HP = pygame.image.load("assets/ogImgs/HP.png")
     SWORD = pygame.image.load("assets/ogImgs/SWORD.png")
     INCREASE = pygame.image.load("assets/imgs/increase.png")
+    CONTINUE = pygame.image.load("assets/imgs/continue.png")
+    CONTINUE = pygame.transform.scale(CONTINUE, (CONTINUE.get_width() * 2 * ASPECT_RATIO, CONTINUE.get_height() * 2 * ASPECT_RATIO))
+    continueRect = CONTINUE.get_rect()
     screen = pygame.display.set_mode(size)
     center_align = (screen.get_width() + 800 * ASPECT_RATIO) / 2
     increaseRect = pygame.rect.Rect(center_align - 130 * ASPECT_RATIO, 310 * ASPECT_RATIO, INCREASE.get_width(), INCREASE.get_height())
 
 # In-game Parameters
 selectedPiece = None
+alteredHP = 0
+alteredAtk = 0
 
 while currentState != STATE.QUIT:
     if currentState == STATE.MENU:
@@ -159,6 +164,12 @@ while currentState != STATE.QUIT:
                         selectedPiece = None
                     else:
                         selectedPiece = piece
+                else:
+                    if continueRect.collidepoint(mouseX, mouseY):
+                        currentState = STATE.GAME
+                    if selectedPiece is not None:
+                        selectedPiece.atk = alteredAtk if alteredAtk != 0 else selectedPiece.atk
+                        selectedPiece.hp = alteredHP if alteredHP != 0 else selectedPiece.hp
 
                 if selectedPiece is not None:
                     if increaseRect.collidepoint(mouseX, mouseY):
@@ -254,35 +265,141 @@ while currentState != STATE.QUIT:
     if selectedPiece is not None:
         located_piece = selectedPiece
 
-    if located_piece is not None and located_piece.active:
-        # Image rescaling
-        rescaled_piece_img = pygame.transform.scale(located_piece.img, (145 * ASPECT_RATIO, 145 * ASPECT_RATIO))
-        rescaled_HP_img = pygame.transform.scale(HP, (92 * ASPECT_RATIO, 92 * ASPECT_RATIO))
-        rescaled_SWORD_img = pygame.transform.scale(SWORD, (92 * ASPECT_RATIO, 92 * ASPECT_RATIO))
+    if currentState == STATE.STRATEGY:
+        if located_piece is not None and located_piece.active:
+            # Image rescaling
+            rescaled_piece_img = pygame.transform.scale(located_piece.img, (145 * ASPECT_RATIO, 145 * ASPECT_RATIO))
+            rescaled_HP_img = pygame.transform.scale(HP, (45 * ASPECT_RATIO, 45 * ASPECT_RATIO))
+            rescaled_SWORD_img = pygame.transform.scale(SWORD, (45 * ASPECT_RATIO, 45 * ASPECT_RATIO))
 
-        # Text type
-        pygame.font.init()
-        font_stats = pygame.font.SysFont('Calibri', int(50 * ASPECT_RATIO))
-        font_desc = pygame.font.SysFont('Calibri', int(26 * ASPECT_RATIO))
-        piece_name = font_stats.render(located_piece.name, False, (0, 0, 0))
-        piece_hp = font_stats.render(str(int(located_piece.hp)), False, (0, 0, 0))
-        piece_atk = font_stats.render(str(int(located_piece.atk)), False, (0, 0, 0))
+            # Text type
+            pygame.font.init()
+            font_stats = pygame.font.SysFont('Calibri', int(50 * ASPECT_RATIO))
+            font_desc = pygame.font.SysFont('Calibri', int(26 * ASPECT_RATIO))
+            piece_name = font_stats.render(located_piece.name, False, (0, 0, 0))
+            # piece_hp = font_stats.render(str(int(located_piece.hp)), False, (0, 0, 0))
+            # piece_atk = font_stats.render(str(int(located_piece.atk)), False, (0, 0, 0))
 
-        # Image display
-        center_align = (screen.get_width() + 800 * ASPECT_RATIO) / 2
-        screen.blit(rescaled_piece_img,
-                    (center_align - rescaled_piece_img.get_width() / 2, 90 * ASPECT_RATIO))  # Piece type
-        screen.blit(piece_name, ((screen.get_width() / 2 - piece_name.get_width() / 2) + (400 * ASPECT_RATIO),
-                                 (screen.get_height() / 2 - piece_name.get_width() / 2) - (317 * ASPECT_RATIO)))
-        screen.blit(piece_hp, (center_align - 30 * ASPECT_RATIO, 300 * ASPECT_RATIO))  # Piece hp stat
-        screen.blit(rescaled_HP_img, (center_align - 130 * ASPECT_RATIO, 280 * ASPECT_RATIO))
-        screen.blit(piece_atk, (center_align + 100 * ASPECT_RATIO, 300 * ASPECT_RATIO))  # Piece atk stat
-        screen.blit(rescaled_SWORD_img, (center_align + 5 * ASPECT_RATIO, 280 * ASPECT_RATIO))
+            # Image display
+            center_align = (screen.get_width() + 800 * ASPECT_RATIO) / 2
+            screen.blit(rescaled_piece_img,
+                        (center_align - rescaled_piece_img.get_width() / 2, 90 * ASPECT_RATIO))  # Piece type
+            screen.blit(piece_name, ((screen.get_width() / 2 - piece_name.get_width() / 2) + (400 * ASPECT_RATIO),
+                                     (screen.get_height() / 2 - piece_name.get_width() / 2) - (317 * ASPECT_RATIO)))
+            # screen.blit(piece_hp, (center_align - 30 * ASPECT_RATIO, 300 * ASPECT_RATIO))  # Piece hp stat
+            screen.blit(rescaled_HP_img, (center_align - 130 * ASPECT_RATIO, 340 * ASPECT_RATIO))
+            barColor = (220, 20, 60)
+            # HP stat bar
+            alteredHP = 0
+            for i in range(located_piece.hp):
+                barRect = pygame.rect.Rect(center_align - 68 * ASPECT_RATIO + i * 20, 350 * ASPECT_RATIO, 19, 30)
 
-        desc(located_piece.desc, (800 * ASPECT_RATIO + (7 * ASPECT_RATIO), 800 * ASPECT_RATIO - (235 * ASPECT_RATIO)))
+                if i == 0:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_left_radius=5,
+                                     border_bottom_left_radius=5)
+                elif i == 9:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                    border_top_right_radius=5,
+                                    border_bottom_right_radius=5)
+                else:
+                    pygame.draw.rect(screen, barColor, barRect)
 
-        if located_piece == selectedPiece:
-            screen.blit(INCREASE, (center_align - 130 * ASPECT_RATIO, 310 * ASPECT_RATIO))
+                if barRect.collidepoint(pygame.mouse.get_pos()):
+                    barColor = (255, 127, 127)
+                    alteredHP = i + 1
+
+            barColor = (255, 255, 255)
+            for i in range(9, located_piece.hp - 1, -1):
+                barRect = pygame.rect.Rect(center_align - 68 * ASPECT_RATIO + i * 20, 350 * ASPECT_RATIO, 19, 30)
+                if barRect.collidepoint(pygame.mouse.get_pos()):
+                    barColor = (255, 127, 127)
+                    alteredHP = i + 1
+
+                if i == 0:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_left_radius=5,
+                                     border_bottom_left_radius=5)
+                elif i == 9:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_right_radius=5,
+                                     border_bottom_right_radius=5)
+                else:
+                    pygame.draw.rect(screen, barColor, barRect)
+
+            # screen.blit(piece_atk, (center_align + 100 * ASPECT_RATIO, 300 * ASPECT_RATIO))  # Piece atk stat
+            screen.blit(rescaled_SWORD_img, (center_align - 130 * ASPECT_RATIO, 270 * ASPECT_RATIO))
+            # Atk stat bar
+            alteredAtk = 0
+            barColor = (255, 191, 0)
+            for i in range(located_piece.atk):
+                barRect = pygame.rect.Rect(center_align - 68 * ASPECT_RATIO + i * 20, 280 * ASPECT_RATIO, 19, 30)
+                if barRect.collidepoint(pygame.mouse.get_pos()):
+                    barColor = (251, 191, 119)
+                    alteredAtk = i + 1
+
+                if i == 0:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_left_radius=5,
+                                     border_bottom_left_radius=5)
+                elif i == 9:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_right_radius=5,
+                                     border_bottom_right_radius=5)
+                else:
+                    pygame.draw.rect(screen, barColor, barRect)
+            barColor = (255, 255, 255)
+            for i in range(9, located_piece.atk - 1, -1):
+                barRect = pygame.rect.Rect(center_align - 68 * ASPECT_RATIO + i * 20, 280 * ASPECT_RATIO, 19, 30)
+                if barRect.collidepoint(pygame.mouse.get_pos()):
+                    barColor = (251, 220, 180)
+                    alteredAtk = i + 1
+
+                if i == 0:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_left_radius=5,
+                                     border_bottom_left_radius=5)
+                elif i == 9:
+                    pygame.draw.rect(screen, barColor, barRect,
+                                     border_top_right_radius=5,
+                                     border_bottom_right_radius=5)
+                else:
+                    pygame.draw.rect(screen, barColor, barRect)
+
+            desc(located_piece.desc,
+                 (800 * ASPECT_RATIO + (7 * ASPECT_RATIO), 800 * ASPECT_RATIO - (235 * ASPECT_RATIO)))
+
+        continueRect.centerx = center_align
+        continueRect.centery = 480 * ASPECT_RATIO
+        screen.blit(CONTINUE, continueRect)
+
+    elif currentState == STATE.GAME:
+        if located_piece is not None:
+            # Image rescaling
+            rescaled_piece_img = pygame.transform.scale(located_piece.img, (145 * ASPECT_RATIO, 145 * ASPECT_RATIO))
+            rescaled_HP_img = pygame.transform.scale(HP, (92 * ASPECT_RATIO, 92 * ASPECT_RATIO))
+            rescaled_SWORD_img = pygame.transform.scale(SWORD, (92 * ASPECT_RATIO, 92 * ASPECT_RATIO))
+
+            # Text type
+            pygame.font.init()
+            font_stats = pygame.font.SysFont('Calibri', int(50 * ASPECT_RATIO))
+            font_desc = pygame.font.SysFont('Calibri', int(26 * ASPECT_RATIO))
+            piece_name = font_stats.render(located_piece.name, False, (0, 0, 0))
+            piece_hp = font_stats.render(str(int(located_piece.hp)), False, (0, 0, 0))
+            piece_atk = font_stats.render(str(int(located_piece.atk)), False, (0, 0, 0))
+
+            # Image display
+            center_align = (screen.get_width() + 800 * ASPECT_RATIO) / 2
+            screen.blit(rescaled_piece_img,
+                        (center_align - rescaled_piece_img.get_width() / 2, 90 * ASPECT_RATIO))  # Piece type
+            screen.blit(piece_name, ((screen.get_width() / 2 - piece_name.get_width() / 2) + (400 * ASPECT_RATIO),
+                                     (screen.get_height() / 2 - piece_name.get_width() / 2) - (317 * ASPECT_RATIO)))
+            screen.blit(piece_hp, (center_align - 30 * ASPECT_RATIO, 300 * ASPECT_RATIO))  # Piece hp stat
+            screen.blit(rescaled_HP_img, (center_align - 130 * ASPECT_RATIO, 280 * ASPECT_RATIO))
+            screen.blit(piece_atk, (center_align + 100 * ASPECT_RATIO, 300 * ASPECT_RATIO))  # Piece atk stat
+            screen.blit(rescaled_SWORD_img, (center_align + 5 * ASPECT_RATIO, 280 * ASPECT_RATIO))
+
+            desc(located_piece.desc, (800 * ASPECT_RATIO + (7 * ASPECT_RATIO), 800 * ASPECT_RATIO - (235 * ASPECT_RATIO)))
 
     # Timer
     font_win = pygame.font.SysFont('Calibri', int(100 * ASPECT_RATIO))
